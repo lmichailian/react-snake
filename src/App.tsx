@@ -1,24 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Board from "./components/Board";
+import "./App.css";
+import Snake from "./components/Snake";
+import Food from "./components/Food";
+import { useState } from "react";
+
+const LIMIT = 85;
 
 function App() {
+  const [snakePosition, setSnakePosition] = useState([
+    { x: 0, y: 0 },
+    { x: 5, y: 0 },
+    { x: 10, y: 0 },
+  ]);
+
+  function randomFood() {
+    return {
+      x: Math.floor(Math.random() * LIMIT),
+      y: Math.floor(Math.random() * LIMIT)
+    };
+  }
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Snake!!!</h1>
+      <Board>
+        <Snake snakePosition={snakePosition} />
+        <Food position={randomFood()} />
+      </Board>
     </div>
   );
 }
