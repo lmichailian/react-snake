@@ -15,16 +15,9 @@ const FoodStyled = styled.div<{ position: Point }>`
     font-size: 20px;
 `;
 
-function Food() {
-    function randomFood() {
-        return {
-            x: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5,
-            y: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5
-        };
-    }
-
+function Food({ position }: { position: Point }) {
     return (
-        <FoodStyled position={randomFood()}>
+        <FoodStyled position={position}>
             🍔
         </FoodStyled>
     )

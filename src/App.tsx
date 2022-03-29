@@ -18,12 +18,17 @@ function App() {
   const [direction, setDirection] = useState('RIGHT');
   const [time, setTime] = useState(350);
   const [gameLoopStatus, setGameLoopStatus] = useState('STOPPED');
+  const [foodPosition, setFoodPosition] = useState({ x: 0, y: 0 });
   const [snakePosition, setSnakePosition] = useState(initialState);
 
   function handlePosition({ x, y }: { x: number, y: number }) {
     const newSnakePosition = [...snakePosition];
     setSnakePosition([...newSnakePosition, { x, y }]);
   }
+
+  useEffect(() => {
+    randomFood()
+  }, [])
 
   useEffect(() => {
     if (gameLoopStatus === 'GAME_OVER') {
@@ -42,7 +47,12 @@ function App() {
         setGameLoopStatus('GAME_OVER');
       }
 
-      snakePosition.shift();
+      if (last.x === foodPosition.x && last.y === foodPosition.y) { 
+        setTime(time - 20);
+        randomFood()
+      } else {
+        snakePosition.shift();
+      }      
 
       if (direction === 'RIGHT') {
         handlePosition({ x: last.x + 5, y: last.y });
@@ -58,7 +68,6 @@ function App() {
 
   function handlePressKey(event: any) {
     const { keyCode } = event;
-
 
     switch (keyCode) {
       case 40: {
@@ -92,6 +101,13 @@ function App() {
     }
   }
 
+  function randomFood() {
+    setFoodPosition({
+      x: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5,
+      y: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5
+    });
+  }
+
   useEventListener('keydown', handlePressKey);
 
   return (
@@ -99,7 +115,7 @@ function App() {
       <h1>Snake!!!</h1>
       <Board >
         <Snake snakePosition={snakePosition} />
-        <Food />
+        <Food position={foodPosition} />
       </Board>
     </div>
   );
