@@ -15,3 +15,7 @@ a {
   justify-content: center;
   align-items: center;
 }
+
+.title {
+  margin-bottom: 16px;
+}

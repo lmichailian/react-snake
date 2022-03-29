@@ -5,19 +5,25 @@ import Food from "./components/Food";
 import { useEffect, useState } from "react";
 import useInterval from "./hooks/useInterval";
 import useEventListener from "./hooks/useEventListener";
+import { Direction, GameStatus } from "./types";
 
+import title from './assets/title.png';
 
+const MIN = 5
+const MAX = 85
+const INITIAL_Y = 40
+const INITIAL_TIME = 350;
 
 function App() {
   const initialState = [
-    { x: 5, y: 40 },
-    { x: 10, y: 40 },
-    { x: 15, y: 40 },
+    { x: MIN, y: INITIAL_Y },
+    { x: MIN * 2, y: INITIAL_Y },
+    { x: MIN * 3, y: INITIAL_Y },
   ]
 
-  const [direction, setDirection] = useState('RIGHT');
-  const [time, setTime] = useState(350);
-  const [gameLoopStatus, setGameLoopStatus] = useState('STOPPED');
+  const [direction, setDirection] = useState<Direction>(Direction.RIGHT);
+  const [time, setTime] = useState(INITIAL_TIME);
+  const [gameLoopStatus, setGameLoopStatus] = useState<GameStatus>(GameStatus.STOPPED);
   const [foodPosition, setFoodPosition] = useState({ x: 0, y: 0 });
   const [snakePosition, setSnakePosition] = useState(initialState);
 
@@ -31,37 +37,40 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (gameLoopStatus === 'GAME_OVER') {
-      setDirection('RIGHT');
+    if (gameLoopStatus === GameStatus.GAME_OVER) {
+      setDirection(Direction.RIGHT);
       setSnakePosition(initialState);
+      setTime(INITIAL_TIME)
       alert('Game Over');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameLoopStatus]);
 
   useInterval(() => {
-    if (gameLoopStatus === 'PLAYING') {
-      const last = snakePosition[snakePosition.length - 1];
+    if (gameLoopStatus === GameStatus.STARTED) {
+      const head = snakePosition[snakePosition.length - 1];
+      const outOfBounds = head.x === 100 || head.x === -5 || head.y === -5 || head.y === 100;
 
-      if (last.x === 100 || last.x === -5 || last.y === -5 || last.y === 100) {
-        setGameLoopStatus('GAME_OVER');
+      if (outOfBounds) {
+        setGameLoopStatus(GameStatus.GAME_OVER);
       }
-
-      if (last.x === foodPosition.x && last.y === foodPosition.y) { 
+      const foodCollide = head.x === foodPosition.x && head.y === foodPosition.y
+      
+      if (foodCollide) {
         setTime(time - 20);
         randomFood()
       } else {
         snakePosition.shift();
-      }      
+      }
 
-      if (direction === 'RIGHT') {
-        handlePosition({ x: last.x + 5, y: last.y });
-      } else if (direction === 'DOWN') {
-        handlePosition({ x: last.x, y: last.y + 5 });
-      } else if (direction === 'UP') {
-        handlePosition({ x: last.x, y: last.y - 5 });
-      } else if (direction === 'LEFT') {
-        handlePosition({ x: last.x - 5, y: last.y });
+      if (direction === Direction.RIGHT) {
+        handlePosition({ x: head.x + MIN, y: head.y });
+      } else if (direction === Direction.DOWN) {
+        handlePosition({ x: head.x, y: head.y + MIN });
+      } else if (direction === Direction.UP) {
+        handlePosition({ x: head.x, y: head.y - MIN });
+      } else if (direction === Direction.LEFT) {
+        handlePosition({ x: head.x - MIN, y: head.y });
       }
     }
   }, time);
@@ -71,30 +80,30 @@ function App() {
 
     switch (keyCode) {
       case 40: {
-        if (direction !== 'UP') {
-          setGameLoopStatus('PLAYING');
-          setDirection('DOWN');
+        if (direction !== Direction.UP) {
+          setGameLoopStatus(GameStatus.STARTED);
+          setDirection(Direction.DOWN);
         }
         break;
       }
       case 38: {
-        if (direction !== 'DOWN') {
-          setGameLoopStatus('PLAYING');
-          setDirection('UP');
+        if (direction !== Direction.DOWN) {
+          setGameLoopStatus(GameStatus.STARTED);
+          setDirection(Direction.UP);
         }
         break;
       }
       case 39: {
-        if (direction !== 'LEFT') {
-          setGameLoopStatus('PLAYING');
-          setDirection('RIGHT');
+        if (direction !== Direction.LEFT) {
+          setGameLoopStatus(GameStatus.STARTED);
+          setDirection(Direction.RIGHT);
         }
         break;
       }
       case 37: {
-        if (direction !== 'RIGHT') {
+        if (direction !== Direction.RIGHT) {
 
-          setDirection('LEFT');
+          setDirection(Direction.LEFT);
         }
         break;
       }
@@ -103,8 +112,8 @@ function App() {
 
   function randomFood() {
     setFoodPosition({
-      x: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5,
-      y: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5
+      x: Math.ceil(Math.floor(Math.random() * MAX) / MIN) * MIN,
+      y: Math.ceil(Math.floor(Math.random() * MAX) / MIN) * MIN
     });
   }
 
@@ -112,7 +121,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Snake!!!</h1>
+      <img className="title" src={title} alt="logo" />
       <Board >
         <Snake snakePosition={snakePosition} />
         <Food position={foodPosition} />
