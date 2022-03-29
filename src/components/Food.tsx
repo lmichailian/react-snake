@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 type Point = {
@@ -10,16 +11,23 @@ const FoodStyled = styled.div<{ position: Point }>`
     top: ${props => props.position.y}%;
     position: absolute;
     box-sizing: border-box;
-    width: 20px;
-    height: 20px;
-    margin: 1px;
-    background-color: red;
+    padding: 1px;
+    font-size: 20px;
 `;
 
-function Food({ position: { x, y } }: { position: Point }) {
+function Food() {
+    function randomFood() {
+        return {
+            x: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5,
+            y: Math.ceil(Math.floor(Math.random() * 85) / 5) * 5
+        };
+    }
+
     return (
-        <FoodStyled position={{ x, y }} />
+        <FoodStyled position={randomFood()}>
+            🍔
+        </FoodStyled>
     )
 }
 
-export default Food
+export default React.memo(Food)
