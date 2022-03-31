@@ -8,6 +8,7 @@ import useEventListener from "./hooks/useEventListener";
 import { Direction, GameStatus } from "./types";
 
 import title from './assets/title.png';
+import useSound from "use-sound";
 
 const MIN = 5
 const MAX = 85
@@ -15,6 +16,10 @@ const INITIAL_Y = 40
 const INITIAL_TIME = 350;
 
 function App() {
+  const [playBackground, exposed] = useSound('./background.ogg', { loop: true });
+  const [playDead] = useSound('./dead.ogg');
+  const [playPickUp] = useSound('./pickup.wav');
+
   const initialState = [
     { x: MIN, y: INITIAL_Y },
     { x: MIN * 2, y: INITIAL_Y },
@@ -41,7 +46,13 @@ function App() {
       setDirection(Direction.RIGHT);
       setSnakePosition(initialState);
       setTime(INITIAL_TIME)
+
+      playDead();
+
       alert('Game Over');
+    } else if (gameLoopStatus === GameStatus.STARTED) {
+      exposed.pause();
+      playBackground()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameLoopStatus]);
@@ -54,10 +65,12 @@ function App() {
       if (outOfBounds) {
         setGameLoopStatus(GameStatus.GAME_OVER);
       }
+
       const foodCollide = head.x === foodPosition.x && head.y === foodPosition.y
-      
+
       if (foodCollide) {
         setTime(time - 20);
+        playPickUp()
         randomFood()
       } else {
         snakePosition.shift();
@@ -102,7 +115,6 @@ function App() {
       }
       case 37: {
         if (direction !== Direction.RIGHT) {
-
           setDirection(Direction.LEFT);
         }
         break;
@@ -121,7 +133,9 @@ function App() {
 
   return (
     <div className="App">
-      <img className="title" src={title} alt="logo" />
+      <img className="title" src={title} alt="title" />
+
+
       <Board >
         <Snake snakePosition={snakePosition} />
         <Food position={foodPosition} />

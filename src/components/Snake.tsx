@@ -13,7 +13,7 @@ const Member = styled.div<{ position: Point }>`
     width: 20px;
     height: 20px;
     
-    background-color: black;
+    background-color: red;
 `;
 
 
@@ -21,7 +21,7 @@ function Snake({ snakePosition }: { snakePosition: Point[] }) {
     return (
         <>
             {snakePosition.map((position, index) => (
-                <Member position={position} />
+                <Member key={index} position={position} />
             ))}
         </>
     );

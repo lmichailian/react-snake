@@ -1,6 +1,7 @@
 * {
   padding: 0;
   margin: 0;
+  
 }
 
 a {
@@ -8,6 +9,8 @@ a {
 }
 
 .App {
+  background: url('../public/wall.png') no-repeat center center;
+  background-size: cover;
   width: 100vw;
   height: 100vh;
   display: flex;
